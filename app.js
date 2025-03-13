@@ -3,12 +3,10 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, se
 import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 import { firebaseConfig } from "./credentials.js";
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Función para mostrar mensajes
 function showMessage(message, divId) {
     const messageDiv = document.getElementById(divId);
     messageDiv.style.display = "block";
@@ -19,7 +17,6 @@ function showMessage(message, divId) {
     }, 5000);
 }
 
-// Validaciones de los campos
 function validateEmail(email) {
     const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     return regex.test(email);
@@ -30,32 +27,49 @@ function validateUsername(username) {
 }
 
 function validatePassword(password, confirmPassword) {
+    if (password.length < 8) {
+        return false;
+    }
     return password === confirmPassword;
 }
 
-// Registro de usuario (sign up)
+// CADASTRO
 const submitSignUpButton = document.getElementById('submitSignUp');
 if (submitSignUpButton) {
     submitSignUpButton.addEventListener('click', async (event) => {
         event.preventDefault();
 
-        const username = document.getElementById('username').value;
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        usernameInput.style.borderColor = '#DAD7CD';
+        emailInput.style.borderColor = '#DAD7CD';
+        passwordInput.style.borderColor = '#DAD7CD';
+        confirmPasswordInput.style.borderColor = '#DAD7CD';
+
+        const username = usernameInput.value;
+        const email = emailInput.value;
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
 
         if (!validateEmail(email)) {
+            emailInput.style.borderColor = '#e01a4a';
             showMessage('Endereço de e-mail inválido!', 'signUpMessage');
             return;
         }
 
         if (!validateUsername(username)) {
+            usernameInput.style.borderColor = '#e01a4a';
             showMessage('O nome de usuário deve ter pelo menos 6 caracteres!', 'signUpMessage');
             return;
         }
 
         if (!validatePassword(password, confirmPassword)) {
-            showMessage('As senhas não coincidem!', 'signUpMessage');
+            passwordInput.style.borderColor = '#e01a4a';
+            confirmPasswordInput.style.borderColor = '#e01a4a';
+            showMessage('Verifique os campos e tente novamente!', 'signUpMessage');
             return;
         }
 
@@ -63,7 +77,6 @@ if (submitSignUpButton) {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Guardar el nombre de usuario en Firestore
             await setDoc(doc(db, "users", user.uid), {
                 username: username,
                 email: email
@@ -75,6 +88,7 @@ if (submitSignUpButton) {
             setTimeout(() => window.location.href = 'login.html', 2000);
         } catch (error) {
             if (error.code === 'auth/email-already-in-use') {
+                emailInput.style.borderColor = 'red';
                 showMessage('Endereço de e-mail já existe!', 'signUpMessage');
             } else {
                 showMessage('Não foi possível criar a conta.', 'signUpMessage');
@@ -84,7 +98,8 @@ if (submitSignUpButton) {
     });
 }
 
-// Login de usuario (sign in)
+
+// LOGIN
 const submitLoginButton = document.getElementById('submitLogin');
 if (submitLoginButton) {
     submitLoginButton.addEventListener('click', async (event) => {
@@ -97,13 +112,11 @@ if (submitLoginButton) {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Verificar si el usuario ha verificado su correo electrónico
             if (user.emailVerified) {
                 alert("Login bem-sucedido!");
                 console.log("Usuario logado:", user);
 
-                // Redirigir al usuario a la página principal (puedes modificar la URL)
-                window.location.href = 'index.html'; // Cambia 'home.html' por la página de destino
+                window.location.href = 'index.html';
             } else {
                 showMessage('Por favor, verifique seu e-mail antes de fazer login.', 'loginMessage');
             }
