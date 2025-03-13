@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="style.css">
     <title>Cadastro - MoodBalance IA</title>
     <script src="https://kit.fontawesome.com/9ded622906.js" crossorigin="anonymous"></script>
+    <script type="module" src="app.js"></script>
 </head>
 <body>
     <div class="container">
@@ -19,12 +20,13 @@
             <button class="social-btn google"><i class="form-icon fa-brands fa-google"></i>  Continuar com Google</button>
             <button class="social-btn facebook"><i class="form-icon fa-brands fa-facebook"></i>  Continuar com Facebook</button>
             <p class="divider">ou</p>
-            <input type="text" placeholder="Usuario" required>
-            <input type="email" placeholder="Email" required>
-            <input type="password" placeholder="Senha" required>
-            <input type="password" placeholder="Confirmar Senha" required>
-            <button class="form-btn">Cadastrar</button>
+            <input autocomplete="off" type="text" id="username" placeholder="Usuário" required>
+            <input autocomplete="off" type="email" id="email" placeholder="Email" required>
+            <input autocomplete="off" type="password" id="password" placeholder="Senha" required>
+            <input autocomplete="off" type="password" id="confirmPassword" placeholder="Confirmar Senha" required>
+            <button class="form-btn" id="submitSignUp">Cadastrar</button>
             <p class="link">Já possui uma conta? <a class="link" href="login.html"><b>Entre</b></a></p>
+            <div id="signUpMessage" class="message"></div>
         </div>
     </div>
 </body>

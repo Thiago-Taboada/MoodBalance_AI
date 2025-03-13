@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="style.css">
     <title>Login - MoodBalance IA</title>
     <script src="https://kit.fontawesome.com/9ded622906.js" crossorigin="anonymous"></script>
+    <script type="module" src="app.js"></script>
 </head>
 <body>
     <div class="container">
@@ -19,10 +20,10 @@
             <button class="social-btn google"><i class="form-icon fa-brands fa-google"></i>  Continuar com Google</button>
             <button class="social-btn facebook"><i class="form-icon fa-brands fa-facebook"></i>  Continuar com Facebook</button>
             <p class="divider">ou</p>
-            <input type="email" placeholder="Email" required>
-            <input type="password" placeholder="Senha" required>
-            <button class="form-btn">Entrar</button>
-            <p class="link">Ainda não possui uma conta? <a class="link" href="signin.html"><b>Cadastre-se</b></a></p>
+            <input type="email" id="email" placeholder="Email" required autocomplete="off">
+            <input type="password" id="password" placeholder="Senha" required autocomplete="off">
+            <button class="form-btn" id="submitLogin">Entrar</button>
+            <p class="link">Ainda não possui uma conta? <a class="link" href="signup.html"><b>Cadastre-se</b></a></p>
             <p class="link"><a class="link" href="#"><b>Esqueceu a senha?</b></a></p>
         </div>
     </div>
