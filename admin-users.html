@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Usuarios - MoodBalance IA</title>
+    <script src="https://kit.fontawesome.com/9ded622906.js" crossorigin="anonymous"></script>
+    <script type="module" src="app.js"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="navbar">
+            <div class="logo">MoodBalance IA</div>
+            <ul class="menu">
+                <li><a href="admin-config.html">Configurações</a></li>
+                <li><a href="admin-users.html" style="border-bottom: 2px solid white;">Usuarios</a></li>
+            </ul>
+            <div class="user-info">
+                <div style="display: flex; align-items: center;">
+                    <a href="#" id="editLink">
+                        <div class="user-avatar" id="userAvatar"></div>
+                        <p class="user-name" id="userName"></p>
+                    </a>
+                </div>
+                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i></a>
+            </div>
+            
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <p>Usuarios</p>
+            </div>
+
+            <div class="central-box"></div>
+        </div>
+    </div>
+</body>
+</html>

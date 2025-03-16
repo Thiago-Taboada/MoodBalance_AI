@@ -1,11 +1,27 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 import { firebaseConfig } from "./credentials.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+function showLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.id = 'loadingOverlay';
+    const spinner = document.createElement('div');
+    overlay.appendChild(spinner);
+    document.body.appendChild(overlay);
+}
+
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        document.body.removeChild(overlay);
+    }
+}
+
 
 function showMessage(message, divId) {
     const messageDiv = document.getElementById(divId);
@@ -39,6 +55,8 @@ if (submitSignUpButton) {
     submitSignUpButton.addEventListener('click', async (event) => {
         event.preventDefault();
 
+        showLoadingOverlay();
+
         const usernameInput = document.getElementById('username');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
@@ -57,12 +75,14 @@ if (submitSignUpButton) {
         if (!validateEmail(email)) {
             emailInput.style.borderColor = '#e01a4a';
             showMessage('Endereço de e-mail inválido!', 'signUpMessage');
+            hideLoadingOverlay();
             return;
         }
 
         if (!validateUsername(username)) {
             usernameInput.style.borderColor = '#e01a4a';
             showMessage('O nome de usuário deve ter pelo menos 6 caracteres!', 'signUpMessage');
+            hideLoadingOverlay();
             return;
         }
 
@@ -70,6 +90,7 @@ if (submitSignUpButton) {
             passwordInput.style.borderColor = '#e01a4a';
             confirmPasswordInput.style.borderColor = '#e01a4a';
             showMessage('Verifique os campos e tente novamente!', 'signUpMessage');
+            hideLoadingOverlay();
             return;
         }
 
@@ -79,14 +100,23 @@ if (submitSignUpButton) {
 
             await setDoc(doc(db, "users", user.uid), {
                 username: username,
-                email: email
+                email: email,
+                admin: false,
+                img: null,
+                last_session: null,
+                phone: null,
+                name: null
             });
 
             await sendEmailVerification(user);
             showMessage('Conta criada com sucesso! Um e-mail de verificação foi enviado.', 'signUpMessage');
 
-            setTimeout(() => window.location.href = 'login.html', 2000);
+            setTimeout(() => {
+                window.location.href = 'login.html';
+                hideLoadingOverlay();
+            }, 2000);
         } catch (error) {
+            hideLoadingOverlay();
             if (error.code === 'auth/email-already-in-use') {
                 emailInput.style.borderColor = 'red';
                 showMessage('Endereço de e-mail já existe!', 'signUpMessage');
@@ -98,29 +128,53 @@ if (submitSignUpButton) {
     });
 }
 
-
 // LOGIN
 const submitLoginButton = document.getElementById('submitLogin');
 if (submitLoginButton) {
     submitLoginButton.addEventListener('click', async (event) => {
         event.preventDefault();
 
-        const email = document.getElementById('email').value;
+        showLoadingOverlay();
+        
+        const emailInput = document.getElementById('email');
         const password = document.getElementById('password').value;
+
+        emailInput.style.borderColor = '#DAD7CD';
+
+        const email = emailInput.value;
+
+        if (!validateEmail(email)) {
+            emailInput.style.borderColor = '#e01a4a';
+            showMessage('Endereço de e-mail inválido!', 'loginMessage');
+            hideLoadingOverlay();
+            return;
+        }
 
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
             if (user.emailVerified) {
-                alert("Login bem-sucedido!");
-                console.log("Usuario logado:", user);
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                const userData = userDoc.data();
 
-                window.location.href = 'index.html';
+                sessionStorage.setItem('email', userData.email);
+                sessionStorage.setItem('username', userData.username);
+                sessionStorage.setItem('img', userData.img);
+                sessionStorage.setItem('phone', userData.phone);
+                sessionStorage.setItem('name', userData.name);
+
+                if (userData.admin) {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
             } else {
                 showMessage('Por favor, verifique seu e-mail antes de fazer login.', 'loginMessage');
             }
+            hideLoadingOverlay();
         } catch (error) {
+            hideLoadingOverlay();
             if (error.code === 'auth/user-not-found') {
                 showMessage('Usuário não encontrado!', 'loginMessage');
             } else if (error.code === 'auth/wrong-password') {
@@ -130,5 +184,36 @@ if (submitLoginButton) {
             }
             console.error(error);
         }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const userAvatar = document.getElementById("userAvatar");
+    const userName = document.getElementById("userName");
+
+    if (userAvatar && userName) {
+        const username = sessionStorage.getItem("username") || "Usuário";
+        let img = sessionStorage.getItem("img");
+
+        if (!img || img === "null") {
+            const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+            userAvatar.style.backgroundColor = randomColor;
+            userAvatar.textContent = username.charAt(0).toUpperCase();
+        } else {
+            userAvatar.style.backgroundImage = `url(${img})`;
+            userAvatar.style.backgroundSize = "cover";
+        }
+
+        userName.textContent = username;
+    }
+});
+
+const logoutLink = document.getElementById('logoutLink');
+if (logoutLink) {
+    logoutLink.addEventListener('click', () => {
+        sessionStorage.clear();
+        localStorage.clear();
+
+        window.location.href = 'login.html';
     });
 }
