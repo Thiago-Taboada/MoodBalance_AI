@@ -27,5 +27,6 @@
 - Conexão com a internet
 
 ## Licença
+Copyright © 2025 Thiago Andres Taboada Didier de Freitas
 
-Este projeto está sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+A distribuição deste projeto ou de qualquer conteúdo dele, seja para fins pessoais ou comerciais, está **estritamente proibida**.
