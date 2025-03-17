@@ -167,7 +167,7 @@ if (submitLoginButton) {
                 if (userData.admin) {
                     window.location.href = 'admin.html';
                 } else {
-                    window.location.href = 'index.html';
+                    window.location.href = 'chat.html';
                 }
             } else {
                 showMessage('Por favor, verifique seu e-mail antes de fazer login.', 'loginMessage');
