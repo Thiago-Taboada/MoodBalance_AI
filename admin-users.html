@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <title>Usuarios - MoodBalance IA</title>
     <script src="auth.js"></script>
@@ -32,14 +29,23 @@
                 </div>
                 <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i></a>
             </div>
-            
         </div>
         <div class="main-content">
             <div class="header">
                 <p>Usuarios</p>
             </div>
 
-            <div class="central-box"></div>
+            <div id="user-list" class="central-box">
+                <!-- Header Row -->
+                <div class="header-row">
+                    <div class="login-header">Login</div>
+                    <div class="admin-header">Admin</div>
+                    <div class="ativo-header">Ativo</div>
+                    <div class="last-session-header">Última Sessão</div>
+                </div>
+                
+                <!-- User Item Rows (generated dynamically by JS) -->
+            </div>
         </div>
     </div>
 </body>

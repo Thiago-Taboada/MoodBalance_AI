@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, setDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 import { firebaseConfig } from "./credentials.js";
 
 const app = initializeApp(firebaseConfig);
@@ -105,7 +105,8 @@ if (submitSignUpButton) {
                 img: null,
                 last_session: null,
                 phone: null,
-                name: null
+                name: null,
+                active: false
             });
 
             await sendEmailVerification(user);
@@ -158,12 +159,27 @@ if (submitLoginButton) {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 const userData = userDoc.data();
 
+                // Obtener la fecha actual en formato dd/mm/aaaa
+                const today = new Date();
+                const dd = String(today.getDate()).padStart(2, '0');
+                const mm = String(today.getMonth() + 1).padStart(2, '0'); // Los meses empiezan en 0
+                const yyyy = today.getFullYear();
+                const currentDate = `${dd}/${mm}/${yyyy}`;
+
+                // Actualizar el campo last_session y cambiar active a true
+                await updateDoc(doc(db, "users", user.uid), {
+                    last_session: currentDate,
+                    active: true
+                });
+
+                // Almacenar los datos del usuario en sessionStorage
                 sessionStorage.setItem('email', userData.email);
                 sessionStorage.setItem('username', userData.username);
                 sessionStorage.setItem('img', userData.img);
                 sessionStorage.setItem('phone', userData.phone);
                 sessionStorage.setItem('name', userData.name);
 
+                // Redirigir dependiendo si es admin o no
                 if (userData.admin) {
                     window.location.href = 'admin.html';
                 } else {
@@ -217,3 +233,88 @@ if (logoutLink) {
         window.location.href = 'login.html';
     });
 }
+
+async function loadUserList() {
+    let userListContainer = document.querySelector('#user-list');
+    const userRows = userListContainer.querySelectorAll('.user-item');
+    userRows.forEach(row => row.remove());
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        
+        querySnapshot.forEach((doc) => {
+            const user = doc.data();
+
+            const userDiv = document.createElement('div');
+            userDiv.classList.add('user-item');
+            
+            const loginDiv = document.createElement('div');
+            loginDiv.classList.add('login-cell');
+            const userImg = document.createElement('div');
+            userImg.classList.add('user-avatar');
+            if (!user.img || user.img === "null") {
+                const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+                userImg.style.backgroundColor = randomColor;
+                userImg.textContent = user.username.charAt(0).toUpperCase();
+            } else {
+                userImg.style.backgroundImage = `url(${user.img})`;
+                userImg.style.backgroundSize = "cover";
+            }
+
+            const userName = document.createElement('p');
+            userName.classList.add('user-name');
+            userName.textContent = user.username;
+
+            loginDiv.appendChild(userImg);
+            loginDiv.appendChild(userName);
+
+            const adminDiv = document.createElement('div');
+            adminDiv.classList.add('admin-cell');
+            const adminIcon = document.createElement('i');
+            adminIcon.classList.add(user.admin ? 'fa-regular' : 'fa-regular', user.admin ? 'fa-square-check' : 'fa-square');
+            adminDiv.appendChild(adminIcon);
+
+            const ativoDiv = document.createElement('div');
+            ativoDiv.classList.add('ativo-cell');
+            const ativoIcon = document.createElement('i');
+            ativoIcon.classList.add(user.active ? 'fa-regular' : 'fa-regular', user.active ? 'fa-square-check' : 'fa-square');
+            ativoDiv.appendChild(ativoIcon);
+
+            const lastSessionDiv = document.createElement('div');
+            lastSessionDiv.classList.add('last-session-cell');
+            const lastSession = document.createElement('p');
+            lastSession.classList.add('last-session');
+            lastSession.textContent = user.last_session ? user.last_session : "Nunca";
+            lastSessionDiv.appendChild(lastSession);
+
+            const editDiv = document.createElement('div');
+            editDiv.classList.add('edit-cell');
+            const editButton = document.createElement('button');
+            editButton.classList.add('edit-button');
+            editButton.innerHTML = `<i class="fa-solid fa-user-pen"></i>`;
+            editButton.addEventListener('click', () => editUser(user));
+            editDiv.appendChild(editButton);
+
+            userDiv.appendChild(loginDiv);
+            userDiv.appendChild(adminDiv);
+            userDiv.appendChild(ativoDiv);
+            userDiv.appendChild(lastSessionDiv);
+            userDiv.appendChild(editDiv);
+
+            userListContainer.appendChild(userDiv);
+        });
+    } catch (error) {
+        console.error("Erro ao carregar usuarios:", error);
+    }
+}
+
+function editUser(user) {
+    console.log('Editando usuario:', user);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const userListContainer = document.querySelector('#user-list');
+    if (userListContainer) {
+        loadUserList();
+    }
+});
