@@ -190,15 +190,19 @@ a {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    border-right: 1px solid #303030;
 }
 
 .aside {
     width: 25vw;
     background-color: #1A231F;
-    padding: 2vh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    border-right: 1px solid #303030;
+}
+.top-aside{
+    padding: 2vh;
 }
 .tool-bar {
     display: flex;
@@ -248,6 +252,7 @@ a {
     color: white;
     font-weight: normal;
     font-size: 2vh;
+    padding: 2vh;
 }
 
 /* #chats{
@@ -294,12 +299,38 @@ a {
     color: #A3B18A;
 }
 
+.pop-up{
+    padding: 10px;
+    padding-bottom: 10px;
+    background: #DAD7CD;
+    border-radius: 20px 20px 0 0;
+    -webkit-border-radius: 20px 20px 0 0;
+    -moz-border-radius: 20px 20px 0 0;
+    -ms-border-radius: 20px 20px 0 0;
+    -o-border-radius: 20px 20px 0 0;
+}
+.pop-up p{
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+.pop-up a{
+    background: #344E41;
+    padding: 5px 10px;
+    color: #fff;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+}
+
 .user-info {
+    border-top: 1px solid #303030;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 10px;
+    padding: 15px;
     border-radius: 8px;
 }
 
@@ -336,7 +367,7 @@ a {
 }
 
 .main-content {
-    width: 75vw;
+    width: 100%;
     background-color: #DAD7CD;
     display: flex;
     flex-direction: column;
@@ -371,7 +402,7 @@ a {
 }
 
 .main-chat {
-    width: 75vw;
+    width: 100%;
     background-color: #344E41;
     display: flex;
     flex-direction: column;
