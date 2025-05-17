@@ -97,7 +97,7 @@ if (submitSignUpButton) {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            await setDoc(doc(db, "users", user.uid), {
+            await setDoc(doc(db, "users", email), {
                 username: username,
                 email: email,
                 admin: false,
@@ -155,7 +155,8 @@ if (submitLoginButton) {
             const user = userCredential.user;
 
             if (user.emailVerified) {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
+                // Usamos email como ID del documento
+                const userDoc = await getDoc(doc(db, "users", user.email));
                 const userData = userDoc.data();
 
                 const today = new Date();
@@ -164,7 +165,7 @@ if (submitLoginButton) {
                 const yyyy = today.getFullYear();
                 const currentDate = `${dd}/${mm}/${yyyy}`;
 
-                await updateDoc(doc(db, "users", user.uid), {
+                await updateDoc(doc(db, "users", user.email), {
                     last_session: currentDate,
                     active: true
                 });

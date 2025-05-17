@@ -176,7 +176,7 @@ a {
 }
 
 
-/* ASIDE */
+/* ASIDE/NAVBAR */
 .wrapper {
     display: flex;
     width: 100vw;
@@ -190,6 +190,22 @@ a {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+}
+
+.aside {
+    width: 25vw;
+    background-color: #1A231F;
+    padding: 2vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.chat-list{
+    text-decoration: none;
+    color: white;
+    font-weight: normal;
+    font-size: 2vh;
 }
 
 .logo {

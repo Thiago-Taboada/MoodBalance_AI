@@ -1,15 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <title>Usuarios - MoodBalance IA</title>
     <script src="auth.js"></script>
     <script>
         checkAuth();
     </script>
+    <script src="https://kit.fontawesome.com/9ded622906.js" crossorigin="anonymous"></script>
+    <script type="module" src="dataHandler.js"></script>
+    <script type="module" src="chats.js"></script>
 </head>
 <body>
-    <h1>Hello world</h1>
+    <div class="wrapper">
+        <div class="aside">
+            <div class="logo">MoodBalance IA</div>
+            <ul class="chat-list">
+                <button id="new-chat"><i class="fa-regular fa-pen-to-square"></i> Nova Conversa</button>
+                <div id="chats"></div>
+            </ul>
+
+            <div class="user-info">
+                <div style="display: flex; align-items: center;">
+                    <a href="#" id="editLink">
+                        <div class="user-avatar" id="userAvatar"></div>
+                        <p class="user-name" id="userName"></p>
+                    </a>
+                </div>
+                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i></a>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <p>Usuarios</p>
+            </div>
+
+            <div class="central-box">
+                <p>Oi</p>
+                <button id="saveMessage">Save</button>
+            </div>
+
+            <div class="modal-overlay" id="editUserModal" style="display: none;">
+                <div class="modal">
+                    <div class="modal-header">Editar Usuario</div>
+                    <div class="modal-content">
+                        <div class="modal-avatar" id="editUserAvatar"></div>
+            
+                        <label id="editNameLabel">Nome</label>
+                        <input type="text" id="editName">
+            
+                        <label>Username</label>
+                        <input type="text" id="editUsername">
+
+                        <label>Telefone Celular</label>
+                        <input type="text" id="editPhone" placeholder="(XX) X XXXX-XXXX">
+            
+                        <label>Email</label>
+                        <input type="email" id="editEmail" disabled>
+            
+                        <label>Última Sessão</label>
+                        <input type="text" id="editLastSession" disabled>
+            
+                        <div class="modal-checkbox">
+                            <input type="checkbox" id="editAdmin">
+                            <label>Admin</label>
+                        </div>
+            
+                        <div class="modal-checkbox">
+                            <input type="checkbox" id="editActive">
+                            <label>Ativo</label>
+                        </div>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="delete-btn">Excluir</button>
+                        <div>
+                            <button class="cancel-btn">Cancelar</button>
+                            <button class="save-btn">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
 </body>
 </html>
