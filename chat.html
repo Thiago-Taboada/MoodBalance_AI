@@ -16,11 +16,21 @@
 <body>
     <div class="wrapper">
         <div class="aside">
-            <div class="logo">MoodBalance IA</div>
-            <ul class="chat-list">
-                <button id="new-chat"><i class="fa-regular fa-pen-to-square"></i> Nova Conversa</button>
+            <div>
+                <div class="logo">MoodBalance IA</div>
+                <div class="tool-bar">
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" name="search" id="search-chat" placeholder="Procurar conversa">
+                    </div>
+                    <button id="new-chat"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="chat-list">
+                
                 <div id="chats"></div>
-            </ul>
+            </div>
+
 
             <div class="user-info">
                 <div style="display: flex; align-items: center;">
