@@ -22,7 +22,6 @@ function hideLoadingOverlay() {
     }
 }
 
-
 function showMessage(message, divId) {
     const messageDiv = document.getElementById(divId);
     messageDiv.style.display = "block";
@@ -159,27 +158,23 @@ if (submitLoginButton) {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 const userData = userDoc.data();
 
-                // Obtener la fecha actual en formato dd/mm/aaaa
                 const today = new Date();
                 const dd = String(today.getDate()).padStart(2, '0');
-                const mm = String(today.getMonth() + 1).padStart(2, '0'); // Los meses empiezan en 0
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
                 const yyyy = today.getFullYear();
                 const currentDate = `${dd}/${mm}/${yyyy}`;
 
-                // Actualizar el campo last_session y cambiar active a true
                 await updateDoc(doc(db, "users", user.uid), {
                     last_session: currentDate,
                     active: true
                 });
 
-                // Almacenar los datos del usuario en sessionStorage
                 sessionStorage.setItem('email', userData.email);
                 sessionStorage.setItem('username', userData.username);
                 sessionStorage.setItem('img', userData.img);
                 sessionStorage.setItem('phone', userData.phone);
                 sessionStorage.setItem('name', userData.name);
 
-                // Redirigir dependiendo si es admin o no
                 if (userData.admin) {
                     window.location.href = 'admin.html';
                 } else {
@@ -203,6 +198,7 @@ if (submitLoginButton) {
     });
 }
 
+// CARREGAR FOTO
 document.addEventListener("DOMContentLoaded", () => {
     const userAvatar = document.getElementById("userAvatar");
     const userName = document.getElementById("userName");
@@ -224,6 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// LOGOUT
 const logoutLink = document.getElementById('logoutLink');
 if (logoutLink) {
     logoutLink.addEventListener('click', () => {
@@ -234,6 +231,38 @@ if (logoutLink) {
     });
 }
 
+// CARREGA AS INFO DO USER ATUAL
+async function loadCurrentUserAndOpenModal() {
+    const email = sessionStorage.getItem('email');
+    if (!email) {
+        console.error("sem email no sessionStorage");
+        return;
+    }
+
+    try {
+        const userDocRef = doc(db, "users", email);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+            const user = userDocSnap.data();
+            openEditModal(user);
+        } else {
+            console.error("Usuario nao encontrado no Firestore");
+        }
+    } catch (error) {
+        console.error("Error ao pegar usuario atual:", error);
+    }
+}
+
+const editLink = document.getElementById('editLink');
+if (editLink) {
+    editLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loadCurrentUserAndOpenModal();
+    });
+}
+
+// PEGA A LISTA DE USERS
 async function loadUserList() {
     let userListContainer = document.querySelector('#user-list');
     const userRows = userListContainer.querySelectorAll('.user-item');
@@ -292,7 +321,7 @@ async function loadUserList() {
             const editButton = document.createElement('button');
             editButton.classList.add('edit-button');
             editButton.innerHTML = `<i class="fa-solid fa-user-pen"></i>`;
-            editButton.addEventListener('click', () => editUser(user));
+            editButton.addEventListener('click', () => openEditModal(user));
             editDiv.appendChild(editButton);
 
             userDiv.appendChild(loginDiv);
@@ -308,8 +337,56 @@ async function loadUserList() {
     }
 }
 
-function editUser(user) {
-    console.log('Editando usuario:', user);
+function formatPhoneNumber(phone) {
+    phone = phone.replace(/\D/g, '');
+    return phone.replace(/^(\d{2})(\d{1})(\d{4})(\d{4})$/, '($1) $2 $3-$4');
+}
+
+
+function openEditModal(user) {
+    document.getElementById('editUserModal').style.display = 'flex';
+    const avatar = document.getElementById('editUserAvatar');
+    avatar.classList.add('user-avatar');
+    
+    if (!user.img || user.img === "null") {
+        const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+        avatar.style.backgroundColor = randomColor;
+        avatar.textContent = user.username.charAt(0).toUpperCase();
+    } else {
+        avatar.style.backgroundImage = `url(${user.img})`;
+        avatar.style.backgroundSize = "cover";
+    }
+    document.getElementById('editName').value = user.name;
+    document.getElementById('editUsername').value = user.username;
+    const phoneInput = document.getElementById('editPhone');
+    if (phoneInput) {
+        phoneInput.value = formatPhoneNumber(user.phone || '');
+    }
+
+    document.getElementById('editEmail').value = user.email;
+    document.getElementById('editLastSession').value = user.last_session;
+    document.getElementById('editAdmin').checked = user.admin;
+    document.getElementById('editActive').checked = user.active;
+}
+
+const cancelBtn = document.querySelector('.cancel-btn');
+if (cancelBtn) {
+    cancelBtn.addEventListener('click', closeEditModal);
+}
+function closeEditModal() {
+    document.getElementById('editUserModal').style.display = 'none';
+    document.getElementById('editName').value = '';
+    document.getElementById('editUsername').value = '';
+    document.getElementById('editEmail').value = '';
+    document.getElementById('editLastSession').value = '';
+    document.getElementById('editAdmin').checked = false;
+    document.getElementById('editActive').checked = false;
+
+    const avatar = document.getElementById('editUserAvatar');
+    avatar.classList.remove('user-avatar');
+    avatar.style.backgroundColor = '';
+    avatar.style.backgroundImage = '';
+    avatar.textContent = '';
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -318,3 +395,16 @@ document.addEventListener("DOMContentLoaded", () => {
         loadUserList();
     }
 });
+
+
+const phoneInput = document.getElementById('editPhone');
+if (phoneInput) {
+    phoneInput.addEventListener('input', (e) => {
+        let cursorPosition = phoneInput.selectionStart;
+        let digits = e.target.value.replace(/\D/g, '');
+        let formatted = formatPhoneNumber(digits);
+
+        phoneInput.value = formatted;
+        phoneInput.setSelectionRange(formatted.length, formatted.length);
+    });
+}

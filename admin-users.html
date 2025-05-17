@@ -36,16 +36,54 @@
             </div>
 
             <div id="user-list" class="central-box">
-                <!-- Header Row -->
                 <div class="header-row">
                     <div class="login-header">Login</div>
                     <div class="admin-header">Admin</div>
                     <div class="ativo-header">Ativo</div>
                     <div class="last-session-header">Última Sessão</div>
                 </div>
-                
-                <!-- User Item Rows (generated dynamically by JS) -->
             </div>
+            <div class="modal-overlay" id="editUserModal" style="display: none;">
+                <div class="modal">
+                    <div class="modal-header">Editar Usuario</div>
+                    <div class="modal-content">
+                        <div class="modal-avatar" id="editUserAvatar"></div>
+            
+                        <label id="editNameLabel">Nome</label>
+                        <input type="text" id="editName">
+            
+                        <label>Username</label>
+                        <input type="text" id="editUsername">
+
+                        <label>Telefone Celular</label>
+                        <input type="text" id="editPhone" placeholder="(XX) X XXXX-XXXX">
+            
+                        <label>Email</label>
+                        <input type="email" id="editEmail" disabled>
+            
+                        <label>Última Sessão</label>
+                        <input type="text" id="editLastSession" disabled>
+            
+                        <div class="modal-checkbox">
+                            <input type="checkbox" id="editAdmin">
+                            <label>Admin</label>
+                        </div>
+            
+                        <div class="modal-checkbox">
+                            <input type="checkbox" id="editActive">
+                            <label>Ativo</label>
+                        </div>
+                    </div>
+                    <div class="modal-buttons">
+                        <button class="delete-btn">Excluir</button>
+                        <div>
+                            <button class="cancel-btn">Cancelar</button>
+                            <button class="save-btn">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 </body>
