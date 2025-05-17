@@ -187,10 +187,24 @@ async function handleSendMessage() {
     }
 
     try {
+        const response = await fetch('http://localhost/message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: messageText }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erro ao enviar mensagem: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log('Resposta do servidor:', data);
+
         await saveChatMessage(messageText, false, activeChatId);
         loadUserChats();
         input.value = '';
-    } catch (error) {
+    }catch (error) {
         console.error("Erro ao enviar mensagem:", error);
         alert("Erro ao enviar a mensagem.");
     }
