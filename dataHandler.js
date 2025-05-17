@@ -209,8 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let img = sessionStorage.getItem("img");
 
         if (!img || img === "null") {
-            const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
-            userAvatar.style.backgroundColor = randomColor;
+            userAvatar.style.backgroundColor = "#333";
             userAvatar.textContent = username.charAt(0).toUpperCase();
         } else {
             userAvatar.style.backgroundImage = `url(${img})`;
@@ -247,6 +246,8 @@ async function loadCurrentUserAndOpenModal() {
         if (userDocSnap.exists()) {
             const user = userDocSnap.data();
             openEditModal(user);
+            console.log("aaaaaaaaaa");
+            
         } else {
             console.error("Usuario nao encontrado no Firestore");
         }
@@ -258,6 +259,7 @@ async function loadCurrentUserAndOpenModal() {
 const editLink = document.getElementById('editLink');
 if (editLink) {
     editLink.addEventListener('click', (e) => {
+        console.log("modallll");
         e.preventDefault();
         loadCurrentUserAndOpenModal();
     });
@@ -283,8 +285,7 @@ async function loadUserList() {
             const userImg = document.createElement('div');
             userImg.classList.add('user-avatar');
             if (!user.img || user.img === "null") {
-                const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
-                userImg.style.backgroundColor = randomColor;
+                userImg.style.backgroundColor = "#333";
                 userImg.textContent = user.username.charAt(0).toUpperCase();
             } else {
                 userImg.style.backgroundImage = `url(${user.img})`;
@@ -350,8 +351,7 @@ function openEditModal(user) {
     avatar.classList.add('user-avatar');
     
     if (!user.img || user.img === "null") {
-        const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
-        avatar.style.backgroundColor = randomColor;
+        avatar.style.backgroundColor = "#333";
         avatar.textContent = user.username.charAt(0).toUpperCase();
     } else {
         avatar.style.backgroundImage = `url(${user.img})`;

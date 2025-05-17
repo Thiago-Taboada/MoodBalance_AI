@@ -1,12 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, setDoc, getDocs, addDoc, updateDoc, Timestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 import { firebaseConfig } from "./credentials.js";
 
-
-
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
 async function loadUserChats() {
@@ -17,8 +13,9 @@ async function loadUserChats() {
     }
 
     const chatsContainer = document.getElementById('chats');
-    if (!chatsContainer) {
-        console.error("Sem #chats container.");
+    const chatTitleP = document.getElementById('chat-title');
+    if (!chatsContainer || !chatTitleP) {
+        console.error("Elemento chats ou chat-title não encontrado.");
         return;
     }
 
@@ -31,8 +28,14 @@ async function loadUserChats() {
 
         if (chatsSnapshot.empty) {
             chatsContainer.textContent = "Nenhum chat encontrado.";
+            chatTitleP.textContent = "Chat";
             return;
         }
+
+        let activeChat = sessionStorage.getItem('activeChat');
+        let activeChatTitle = sessionStorage.getItem('activeChatTitle') || "Chat";
+
+        chatTitleP.textContent = activeChatTitle;
 
         chatsSnapshot.forEach(docSnap => {
             const chatData = docSnap.data();
@@ -41,8 +44,28 @@ async function loadUserChats() {
             chatDiv.textContent = chatData.title || docSnap.id;
             chatDiv.dataset.chatId = docSnap.id;
 
-            // (Opcional) Lógica para abrir chat
-            // chatDiv.addEventListener('click', () => openChat(docSnap.id));
+            if (activeChat === docSnap.id) {
+                chatDiv.classList.add('active');
+            }
+
+            chatDiv.addEventListener('click', () => {
+                activeChat = docSnap.id;
+                activeChatTitle = chatData.title || docSnap.id;
+
+                sessionStorage.setItem('activeChat', activeChat);
+                sessionStorage.setItem('activeChatTitle', activeChatTitle);
+
+                const allChats = chatsContainer.querySelectorAll('.chat-item');
+                allChats.forEach(chat => chat.classList.remove('active'));
+                chatDiv.classList.add('active');
+
+                chatTitleP.textContent = activeChatTitle;
+
+                document.getElementById('splash').style.display = 'none';
+                document.querySelector('.main-chat').style.display = 'flex';
+
+                console.log("Chat ativo:", activeChat, activeChatTitle);
+            });
 
             chatsContainer.appendChild(chatDiv);
         });
@@ -50,6 +73,7 @@ async function loadUserChats() {
     } catch (error) {
         console.error("Erro ao carregar chats:", error);
         chatsContainer.textContent = "Erro ao carregar chats.";
+        document.getElementById('chat-title').textContent = "Chat";
     }
 }
 
@@ -150,12 +174,39 @@ document.getElementById('new-chat').addEventListener('click', async () => {
     }
 });
 
-document.getElementById('saveMessage').addEventListener('click', () => {
-    saveChatMessage("Hola, ¿estás ahí?", false, "maria_paula");
-    saveChatMessage("si bb", true, "maria_paula");
-    saveChatMessage("ah ok", false, "maria_paula");
+async function handleSendMessage() {
+    const input = document.getElementById('message');
+    const messageText = input.value.trim();
+    const activeChatId = sessionStorage.getItem('activeChat');
+
+    if (!messageText) return;
+
+    if (!activeChatId) {
+        alert("Nenhum chat selecionado!");
+        return;
+    }
+
+    try {
+        await saveChatMessage(messageText, false, activeChatId);
+        loadUserChats();
+        input.value = '';
+    } catch (error) {
+        console.error("Erro ao enviar mensagem:", error);
+        alert("Erro ao enviar a mensagem.");
+    }
+}
+
+document.getElementById('sendMessage').addEventListener('click', handleSendMessage);
+document.getElementById('message').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSendMessage();
+    }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
     loadUserChats();
+    
+    document.getElementById('splash').style.display = 'flex';
+    document.querySelector('.main-chat').style.display = 'none';
 });

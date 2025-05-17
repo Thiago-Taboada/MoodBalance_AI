@@ -27,8 +27,9 @@
                 </div>
             </div>
             <div class="chat-list">
-                
-                <div id="chats"></div>
+                <div id="chats">
+                    <!-- Lista dos chats aqui -->
+                </div>
             </div>
 
 
@@ -42,57 +43,63 @@
                 <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i></a>
             </div>
         </div>
-        <div class="main-content">
+        <div id="splash">
+            <p>Sua plataforma inteligente para acompanhamento psicologico.</p>
+        </div>
+        <div class="main-chat" style="display: none;">
             <div class="header">
-                <p>Usuarios</p>
+                <p id="chat-title">Chat</p>
             </div>
 
-            <div class="central-box">
-                <p>Oi</p>
-                <button id="saveMessage">Save</button>
+            <div class="messages-bg">
+                <!-- As mensagens vao aparecer aqui -->
             </div>
 
-            <div class="modal-overlay" id="editUserModal" style="display: none;">
-                <div class="modal">
-                    <div class="modal-header">Editar Usuario</div>
-                    <div class="modal-content">
-                        <div class="modal-avatar" id="editUserAvatar"></div>
-            
-                        <label id="editNameLabel">Nome</label>
-                        <input type="text" id="editName">
-            
-                        <label>Username</label>
-                        <input type="text" id="editUsername">
+            <div class="message-bar">
+                <input type="text" name="" id="message" placeholder="Escrever mensagem..." autocomplete="off">
+                <i class="fa-solid fa-microphone"></i>
+                <button id="sendMessage">Enviar <i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <div class="modal-overlay" id="editUserModal" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">Editar Usuario</div>
+                <div class="modal-content">
+                    <div class="modal-avatar" id="editUserAvatar"></div>
+        
+                    <label id="editNameLabel">Nome</label>
+                    <input type="text" id="editName">
+        
+                    <label>Username</label>
+                    <input type="text" id="editUsername">
 
-                        <label>Telefone Celular</label>
-                        <input type="text" id="editPhone" placeholder="(XX) X XXXX-XXXX">
-            
-                        <label>Email</label>
-                        <input type="email" id="editEmail" disabled>
-            
-                        <label>Última Sessão</label>
-                        <input type="text" id="editLastSession" disabled>
-            
-                        <div class="modal-checkbox">
-                            <input type="checkbox" id="editAdmin">
-                            <label>Admin</label>
-                        </div>
-            
-                        <div class="modal-checkbox">
-                            <input type="checkbox" id="editActive">
-                            <label>Ativo</label>
-                        </div>
+                    <label>Telefone Celular</label>
+                    <input type="text" id="editPhone" placeholder="(XX) X XXXX-XXXX">
+        
+                    <label>Email</label>
+                    <input type="email" id="editEmail" disabled>
+        
+                    <label>Última Sessão</label>
+                    <input type="text" id="editLastSession" disabled>
+        
+                    <div class="modal-checkbox">
+                        <input type="checkbox" id="editAdmin">
+                        <label>Admin</label>
                     </div>
-                    <div class="modal-buttons">
-                        <button class="delete-btn">Excluir</button>
-                        <div>
-                            <button class="cancel-btn">Cancelar</button>
-                            <button class="save-btn">Salvar</button>
-                        </div>
+        
+                    <div class="modal-checkbox">
+                        <input type="checkbox" id="editActive">
+                        <label>Ativo</label>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="delete-btn">Excluir</button>
+                    <div>
+                        <button class="cancel-btn">Cancelar</button>
+                        <button class="save-btn">Salvar</button>
                     </div>
                 </div>
             </div>
-            
         </div>
     </div>
 </body>
