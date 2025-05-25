@@ -5,6 +5,21 @@ import { firebaseConfig } from "./credentials.js";
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+function showLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.id = 'loadingOverlay';
+    const spinner = document.createElement('div');
+    overlay.appendChild(spinner);
+    document.body.appendChild(overlay);
+}
+
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        document.body.removeChild(overlay);
+    }
+}
+
 async function loadUserChats() {
     const userEmail = sessionStorage.getItem('email');
     if (!userEmail) {
@@ -48,7 +63,7 @@ async function loadUserChats() {
                 chatDiv.classList.add('active');
             }
 
-            chatDiv.addEventListener('click', () => {
+            chatDiv.addEventListener('click', async() => {
                 activeChat = docSnap.id;
                 activeChatTitle = chatData.title || docSnap.id;
 
@@ -63,6 +78,7 @@ async function loadUserChats() {
 
                 document.getElementById('splash').style.display = 'none';
                 document.querySelector('.main-chat').style.display = 'flex';
+                await loadChatMessages();
 
                 console.log("Chat ativo:", activeChat, activeChatTitle);
             });
@@ -186,6 +202,8 @@ async function handleSendMessage() {
         return;
     }
 
+    showLoadingOverlay();
+
     try {
         const response = await fetch('http://localhost/message', {
             method: 'POST',
@@ -198,15 +216,90 @@ async function handleSendMessage() {
         if (!response.ok) {
             throw new Error(`Erro ao enviar mensagem: ${response.statusText}`);
         }
+
         const data = await response.json();
         console.log('Resposta do servidor:', data);
 
+        // Salvar as mensagens no firebase
         await saveChatMessage(messageText, false, activeChatId);
-        loadUserChats();
+        if (data.response) {
+            await saveChatMessage(data.response, true, activeChatId);
+        }
+
+        await loadUserChats();
+        await loadChatMessages();
+
         input.value = '';
-    }catch (error) {
+    } catch (error) {
         console.error("Erro ao enviar mensagem:", error);
         alert("Erro ao enviar a mensagem.");
+    } finally {
+        hideLoadingOverlay();
+    }
+}
+
+async function loadChatMessages() {
+    const email = sessionStorage.getItem('email');
+    const chatId = sessionStorage.getItem('activeChat');
+
+    const messagesContainer = document.querySelector('.messages-bg');
+    messagesContainer.innerHTML = '';
+
+    if (!email || !chatId) {
+        console.error("Email o chatId não encontrados na session.");
+        return;
+    }
+
+    try {
+        const chatRef = doc(db, "users", email, "chats", chatId);
+        const messagesRef = collection(chatRef, "messages");
+        const q = query(messagesRef, orderBy("timestamp", "asc"));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            messagesContainer.innerHTML = '<p style="text-align:center; color:#888;">Nenhuma mensagem ainda.</p>';
+            return;
+        }
+
+        const now = new Date();
+
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            const timestamp = data.timestamp.toDate();
+
+            const isToday = (
+                timestamp.getDate() === now.getDate() &&
+                timestamp.getMonth() === now.getMonth() &&
+                timestamp.getFullYear() === now.getFullYear()
+            );
+
+            const displayTime = isToday
+                ? timestamp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: true })
+                : timestamp.toLocaleDateString('pt-BR');
+
+            const wrapperDiv = document.createElement('div');
+            wrapperDiv.classList.add('message-wrapper');
+            wrapperDiv.classList.add(data.sender === 'system' ? 'system' : 'user');
+
+            const timeDiv = document.createElement('div');
+            timeDiv.classList.add('message-timestamp');
+            timeDiv.textContent = displayTime;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(data.sender === 'system' ? 'system' : 'user');
+            messageDiv.textContent = data.text;
+
+            wrapperDiv.appendChild(timeDiv);
+            wrapperDiv.appendChild(messageDiv);
+            messagesContainer.appendChild(wrapperDiv);
+        });
+
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    } catch (error) {
+        console.error("Erro ao carregar mensagens:", error);
+        messagesContainer.innerHTML = '<p style="text-align:center; color:red;">Erro ao carregar mensagens.</p>';
     }
 }
 
