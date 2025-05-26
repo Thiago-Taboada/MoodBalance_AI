@@ -35,7 +35,7 @@
             <div>
                 <div class="pop-up">
                    <p>Converse com um profissional de verdade!</p>
-                   <a href="#">Agendar consulta</a>
+                   <a href="#" id="appointmentModalButton">Agendar consulta</a>
                 </div>
                 <div class="user-info">
                     <div style="display: flex; align-items: center;">
@@ -79,7 +79,7 @@
                     <input type="text" id="editUsername">
 
                     <label>Telefone Celular</label>
-                    <input type="text" id="editPhone" placeholder="(XX) X XXXX-XXXX">
+                    <input type="text" id="editPhone" placeholder="(XX) X XXXX-XXXX" autocomplete="off">
         
                     <label>Email</label>
                     <input type="email" id="editEmail" disabled>
@@ -87,12 +87,12 @@
                     <label>Última Sessão</label>
                     <input type="text" id="editLastSession" disabled>
         
-                    <div class="modal-checkbox">
+                    <div class="modal-checkbox" style="display: none;">
                         <input type="checkbox" id="editAdmin">
                         <label>Admin</label>
                     </div>
         
-                    <div class="modal-checkbox">
+                    <div class="modal-checkbox" style="display: none;">
                         <input type="checkbox" id="editActive">
                         <label>Ativo</label>
                     </div>
@@ -103,6 +103,28 @@
                         <button class="cancel-btn">Cancelar</button>
                         <button class="save-btn">Salvar</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="appointmentModal" style="display: none;">
+            <div class="modal">
+                <div class="modal-header">Agendar Consulta</div>
+                <div class="modal-content">
+        
+                    <label id="editNameLabel">Nome Completo</label>
+                    <input type="text" id="appointmentName">
+
+                    <label>Telefone Celular</label>
+                    <input type="text" id="appointmentPhone" placeholder="(XX) X XXXX-XXXX" autocomplete="off">
+        
+                    <label>Email</label>
+                    <input type="email" id="appointmentEmail" disabled>
+
+                </div>
+                <div class="modal-buttons">
+                        <button class="cancel-btn" id="cancelAppointment">Cancelar</button>
+                        <button class="save-btn">Confirmar</button>
                 </div>
             </div>
         </div>

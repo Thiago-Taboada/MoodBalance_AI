@@ -79,8 +79,6 @@ async function loadUserChats() {
                 document.getElementById('splash').style.display = 'none';
                 document.querySelector('.main-chat').style.display = 'flex';
                 await loadChatMessages();
-
-                console.log("Chat ativo:", activeChat, activeChatTitle);
             });
 
             chatsContainer.appendChild(chatDiv);
@@ -133,8 +131,6 @@ async function saveChatMessage(message, systemMessage, chatId) {
         await updateDoc(chatRef, {
             last_updated: nowTimestamp
         });
-
-        console.log(`Mensagem guardada em ${chatId} como ${messageId}`);
     } catch (error) {
         console.error("Erro ao guardar a mensagem:", error.message || error);
     }
@@ -218,7 +214,6 @@ async function handleSendMessage() {
         }
 
         const data = await response.json();
-        console.log('Resposta do servidor:', data);
 
         // Salvar as mensagens no firebase
         await saveChatMessage(messageText, false, activeChatId);

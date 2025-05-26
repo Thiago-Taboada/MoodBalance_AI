@@ -246,8 +246,6 @@ async function loadCurrentUserAndOpenModal() {
         if (userDocSnap.exists()) {
             const user = userDocSnap.data();
             openEditModal(user);
-            console.log("aaaaaaaaaa");
-            
         } else {
             console.error("Usuario nao encontrado no Firestore");
         }
@@ -258,12 +256,19 @@ async function loadCurrentUserAndOpenModal() {
 
 const editLink = document.getElementById('editLink');
 if (editLink) {
-    editLink.addEventListener('click', (e) => {
-        console.log("modallll");
+    editLink.addEventListener('click', async (e) => {
         e.preventDefault();
-        loadCurrentUserAndOpenModal();
+        showLoadingOverlay();
+        try {
+            await loadCurrentUserAndOpenModal();
+        } catch (error) {
+            console.error("Erro ao carregar usuário e abrir modal:", error);
+        } finally {
+            hideLoadingOverlay();
+        }
     });
 }
+
 
 // PEGA A LISTA DE USERS
 async function loadUserList() {
@@ -340,10 +345,21 @@ async function loadUserList() {
 }
 
 function formatPhoneNumber(phone) {
-    phone = phone.replace(/\D/g, '');
-    return phone.replace(/^(\d{2})(\d{1})(\d{4})(\d{4})$/, '($1) $2 $3-$4');
-}
+    phone = phone.replace(/\D/g, ''); // quitar no numéricos
 
+    if (phone.length === 0) return ''; // deja vacío para mostrar el placeholder
+    if (phone.length <= 2) {
+        return `(${phone}`;
+    } else if (phone.length <= 3) {
+        return `(${phone.slice(0, 2)}) ${phone.slice(2)}`;
+    } else if (phone.length <= 7) {
+        return `(${phone.slice(0, 2)}) ${phone.slice(2, 3)} ${phone.slice(3)}`;
+    } else if (phone.length <= 11) {
+        return `(${phone.slice(0, 2)}) ${phone.slice(2, 3)} ${phone.slice(3, 7)}-${phone.slice(7)}`;
+    } else {
+        return `(${phone.slice(0, 2)}) ${phone.slice(2, 3)} ${phone.slice(3, 7)}-${phone.slice(7, 11)}`;
+    }
+}
 
 function openEditModal(user) {
     document.getElementById('editUserModal').style.display = 'flex';
@@ -370,10 +386,49 @@ function openEditModal(user) {
     document.getElementById('editActive').checked = user.active;
 }
 
-const cancelBtn = document.querySelector('.cancel-btn');
-if (cancelBtn) {
-    cancelBtn.addEventListener('click', closeEditModal);
+function openAppointmentModal() {
+    const modal = document.getElementById('appointmentModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+
+    const name = sessionStorage.getItem('name') || '';
+    const phone = sessionStorage.getItem('phone') || '';
+    const email = sessionStorage.getItem('email') || '';
+
+    const nameInput = document.getElementById('appointmentName');
+    if (nameInput) nameInput.value = name;
+
+    const appointPhoneInput = document.getElementById('appointmentPhone');
+    if (appointPhoneInput) {
+        appointPhoneInput.value = formatPhoneNumber(phone);
+
+        if (!appointPhoneInput.dataset.listenerAttached) {
+            appointPhoneInput.addEventListener('input', (e) => {
+                let digits = e.target.value.replace(/\D/g, '');
+                let formatted = formatPhoneNumber(digits);
+                appointPhoneInput.value = formatted;
+                appointPhoneInput.setSelectionRange(formatted.length, formatted.length);
+            });
+
+            appointPhoneInput.dataset.listenerAttached = 'true';
+        }
+    }
+
+    const emailInput = document.getElementById('appointmentEmail');
+    if (emailInput) emailInput.value = email;
 }
+
+function closeAppointmentModal() {
+    document.getElementById('appointmentModal').style.display = 'none';
+    document.getElementById('appointmentName').value = '';
+    const appointmentPhoneInput = document.getElementById('appointmentPhone');
+    if (appointmentPhoneInput) {
+        appointmentPhoneInput.value = '';
+    }
+    document.getElementById('appointmentEmail').value = '';
+}
+
 function closeEditModal() {
     document.getElementById('editUserModal').style.display = 'none';
     document.getElementById('editName').value = '';
@@ -408,4 +463,19 @@ if (phoneInput) {
         phoneInput.value = formatted;
         phoneInput.setSelectionRange(formatted.length, formatted.length);
     });
+}
+
+const cancelBtn = document.querySelector('.cancel-btn');
+if (cancelBtn) {
+    cancelBtn.addEventListener('click', closeEditModal);
+}
+
+const appointmentCancelBtn = document.querySelector('#cancelAppointment'); 
+if (appointmentCancelBtn) {
+    appointmentCancelBtn.addEventListener('click', closeAppointmentModal);
+}
+
+const appointmentButton = document.getElementById('appointmentModalButton');
+if (appointmentButton) {
+    appointmentButton.addEventListener('click', () => openAppointmentModal());
 }
